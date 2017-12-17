@@ -43,6 +43,7 @@ const vinylPaths = require('vinyl-paths');
 // Style related
 var style = {
   src: './src/scss/main.scss',
+  srcFiles: './src/scss/**/*.scss',
   dest: './dist/css/',
   destFiles: './dist/css/*.+(css|map)'
 };
@@ -63,7 +64,8 @@ const AUTOPREFIXER_BROWSERS = [
 // Script folders and files
 var script = {
   user: {
-    srcfiles: './src/js/user/user.js',
+    srcFile: './src/js/user/user.js',
+    srcFiles: './src/js/user/**/*.js',
     destPath: './dist/js/',
     destFiles: './dist/js/*.+(js|map)',
   },
@@ -82,6 +84,26 @@ var html = {
     path      : './',
     files     : '*.html'
   }
+};
+
+// Image folders and files
+var images = {
+  src: {
+    path      : './src/images/',
+    files     : './src/images/*.{png,jpg,gif,svg}'
+  },
+  dest: {
+    path      : './dist/images/',
+    files     : './dist/images/*.{png,jpg,gif,svg}'
+  }
+};
+
+// Watch variables
+var watch = {
+  styles    : style.srcFiles,
+  scripts   : script.srcFiles,
+  images    : images.src.files,
+  html      : html.src.files
 };
 
 var config = {
@@ -112,12 +134,12 @@ function errorLog(error) {
  *
  * Cleans destination files
  */
-gulp.task('clean:css', function () {
+gulp.task('clean:css', () => {
   return gulp.src([style.destFiles])
     .pipe(gprint())
     .pipe(vinylPaths(del));
 });
-gulp.task('clean:js', function () {
+gulp.task('clean:js', () => {
   return gulp.src([script.user.destFiles])
     .pipe(gprint())
     .pipe(vinylPaths(del));
@@ -151,7 +173,7 @@ gulp.task('build:appJs', ['clean:js'], () => {
     ]
   };
 
-  return gulp.src(script.user.srcfiles)
+  return gulp.src(script.user.srcFile)
     .pipe(plumber({errorHandler: errorLog}))
     .pipe(named())
     .pipe(webpackStream(options))
@@ -175,7 +197,7 @@ gulp.task('build:appJs', ['clean:js'], () => {
 var minifyCss = lazypipe()
   .pipe(cleancss, {keepSpecialComments: false});
 
-gulp.task('build:css', ['clean:css'], function() {
+gulp.task('build:css', ['clean:css'], () => {
   return gulp.src(style.src)
     .pipe(plumber({errorHandler: errorLog}))
     .pipe(gulpif(config.sourceMaps, sourcemaps.init()))
@@ -196,7 +218,7 @@ gulp.task('build:css', ['clean:css'], function() {
 /**
  * Datestamp for cache busting
  */
-var getDate = function() {
+var getDate = () => {
   var myDate = new Date();
 
   var myYear    = myDate.getFullYear().toString();
@@ -211,7 +233,7 @@ var getDate = function() {
 /**
  * Task: render HTML template
  */
-gulp.task( 'render:html', function() {
+gulp.task( 'render:html', () => {
   var date = getDate();
   var cacheBust = lazypipe()
     .pipe( replace, /(dist)(.*)(\.)(css|js)/g, '$1$2$3$4?' + date );
@@ -232,7 +254,7 @@ gulp.task( 'render:html', function() {
 /**
  * Task: `browser-sync`.
  */
-gulp.task( 'browser-sync', function() {
+gulp.task( 'browser-sync', () => {
   browserSync.init( {
 
     // built-in static server for basic HTML/JS/CSS websites
@@ -254,4 +276,46 @@ gulp.task( 'browser-sync', function() {
     // The small pop-over notifications in the browser are not always needed/wanted
     notify: true,
   });
+});
+
+/**
+ * Default Gulp task
+ */
+gulp.task( 'default', gulpSequence('clean:all', 'build:css', 'build:appJs', 'render:html'));
+
+/**
+ * Production task
+ */
+gulp.task( 'build:prod', gulpSequence('clean:all', 'build:css', 'build:appJs', 'render:html'));
+
+/**
+ * Run all the tasks sequentially
+ * Use this task for development
+ */
+gulp.task( 'serve', gulpSequence('render:html', 'build:css', 'build:appJs', 'watch'));
+
+/**
+  * Watch Tasks.
+  *
+  * Watches for file changes and runs specific tasks.
+  */
+gulp.task( 'watch', ['browser-sync'], () => {
+  gulp.watch( watch.styles, [ 'build:css' ] );
+  gulp.watch( watch.html, [ 'watch:html' ] );
+  gulp.watch( watch.scripts, [ 'watch:js' ] );
+  gulp.watch( watch.images, [ 'watch:img' ] );
+});
+
+// reloading browsers
+gulp.task('watch:html', ['render:html'], (done) => {
+  reload();
+  done();
+});
+gulp.task('watch:js', ['js:custom'], (done) => {
+  reload();
+  done();
+});
+gulp.task('watch:img', ['image:compress'], (done) => {
+  reload();
+  done();
 });
