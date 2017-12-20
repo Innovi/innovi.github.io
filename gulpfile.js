@@ -311,7 +311,7 @@ gulp.task('watch:html', ['render:html'], (done) => {
   reload();
   done();
 });
-gulp.task('watch:js', ['js:custom'], (done) => {
+gulp.task('watch:js', ['build:appJs'], (done) => {
   reload();
   done();
 });
