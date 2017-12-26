@@ -101,7 +101,7 @@ var images = {
 // Watch variables
 var watch = {
   styles    : style.srcFiles,
-  scripts   : script.srcFiles,
+  scripts   : script.user.srcFiles,
   images    : images.src.files,
   html      : html.src.files
 };
