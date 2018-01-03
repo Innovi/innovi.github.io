@@ -26,3 +26,17 @@
 .accent-text {
   color: $mdc-red-500;
 }
+
+.location-info {
+  padding: 40px 20px;
+  p {
+    line-height: 0.9;
+  }
+}
+.head-office,
+.phone-info,
+.mail-info {
+  &:not(:last-child) {
+    margin-bottom: 50px;
+  }
+}
