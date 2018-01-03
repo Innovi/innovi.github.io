@@ -1,5 +1,7 @@
 // Vendor
 @import "../../node_modules/bootstrap/scss/bootstrap";
+@import "../../node_modules/slick-carousel/slick/slick.scss";
+@import "../../node_modules/slick-carousel/slick/slick-theme.scss";
 
 // Utility
 @import "./2-utils/_fonts";
@@ -15,9 +17,11 @@
 @import "./4-layout/_footer";
 
 // Components
+@import "./5-components/_social-links";
 
 // Themes
 @import "./6-themes/_theme";
 
 // Pages
 @import "./7-pages/_home";
+@import "./7-pages/_profile-one";

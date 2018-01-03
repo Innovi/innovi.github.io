@@ -101,7 +101,7 @@ var images = {
 // Watch variables
 var watch = {
   styles    : style.srcFiles,
-  scripts   : script.srcFiles,
+  scripts   : script.user.srcFiles,
   images    : images.src.files,
   html      : html.src.files
 };
@@ -311,7 +311,7 @@ gulp.task('watch:html', ['render:html'], (done) => {
   reload();
   done();
 });
-gulp.task('watch:js', ['js:custom'], (done) => {
+gulp.task('watch:js', ['build:appJs'], (done) => {
   reload();
   done();
 });
